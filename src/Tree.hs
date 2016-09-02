@@ -1,10 +1,7 @@
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving, DeriveFunctor #-}
-{-# LANGUAGE DataKinds, GADTs, RankNTypes #-}
+{-# LANGUAGE UndecidableInstances #-} -- for Show only
+{-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 module Tree where
 
 --import Control.Comonad
@@ -16,27 +13,14 @@ import Data.Foldable
 -- Then we can always extract, no?
 
 data Tree a where
-  --Leaf :: forall f a . (a ~ f a) => Tree a
-  --Leaf :: forall f a . (f ~ Tree) => Tree (f a)
   Leaf :: Tree a
   Fork :: Tree a -> Tree a -> Tree a
  deriving Functor
 
 data RTree a = RLeaf | a `RBranch` [RTree a] deriving (Eq, Show)
 
---instance Comonad Tree where
+--instance Comonad RTree where
   --extract
-
-
---deriving instance Functor Tree
-
-newtype Fix f = Fix (f (Fix f))
-
---instance Functor
-
---selfLeaf :: Tree (Tree (Tree a))
---selfLeaf = Leaf
-
 
 -- * Higher tree
 
@@ -85,9 +69,8 @@ t313 = 'a' `Branch` (HLeaf `Branch` Point (('b' `Branch` HLeaf) `Branch` Point (
 
 -- *** Top-dimensional extraction
 
-top :: forall n a . HTree n a -> RTree a
-top HLeaf = RLeaf
-top (a `Branch` t) = a `RBranch` undefined -- foldMap (pure . top) t -- fmap (top :: HTree n a -> RTree a) t
+top :: Roseable (HTree n) => HTree n a -> RTree a
+top = roseMap id
 
 
 class Roseable f where
@@ -98,9 +81,7 @@ instance Roseable (HTree Z) where
 instance (Foldable (HTree n), Roseable (HTree n)) => Roseable (HTree (S n)) where
   roseMap _ HLeaf = RLeaf
   roseMap f (a `Branch` t) = f a `RBranch` roses
-    where roses = (foldMap ((:[]) . roseMap f) t) -- roseMap go t
-          --go HLeaf = Nothing
-          --go (a `Branch` t) = Just a
+    where roses = (foldMap ((:[]) . roseMap f) t)
 
 
 instance Foldable (HTree Z) where
@@ -108,11 +89,9 @@ instance Foldable (HTree Z) where
 
 instance Foldable (HTree n) => Foldable (HTree (S n)) where
   foldMap _ HLeaf = mempty
-  foldMap f (a `Branch` t) = f a `mappend` foldMap go t -- undefined -- a `mappend` (_ t)
+  foldMap f (a `Branch` t) = f a `mappend` foldMap go t
     where go HLeaf = mempty
-          go (b `Branch` u) = f b `mappend` foldMap go u -- mempty
-
-
+          go (b `Branch` u) = f b `mappend` foldMap go u
 
 -- *** Extrude
 
@@ -121,9 +100,9 @@ instance Foldable (HTree n) => Foldable (HTree (S n)) where
 
 -- *** Diagrams?
 
-class HComonad (hf :: Peano -> * -> *) where
+class HComonad hf where
   extract :: hf n a -> a
-  duplicate :: hf (S n) a -> hf n (hf (S n) a) -- looping??
+  duplicate :: hf (S n) a -> hf n (hf (S n) a)
 
 instance HComonad HTree where
   --extract :: HTree n a -> a

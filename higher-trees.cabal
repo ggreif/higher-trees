@@ -10,7 +10,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Gabor Greif
 maintainer:          ggreif@gmail.com
--- copyright:           
+copyright:           © 2016, Gabor Greif
 category:            Data
 build-type:          Simple
 extra-source-files:  README.md
@@ -22,4 +22,4 @@ library
   other-extensions:    UndecidableInstances, InstanceSigs, KindSignatures, FlexibleContexts, FlexibleInstances, StandaloneDeriving, DeriveFunctor, DataKinds, GADTs, RankNTypes
   build-depends:       base >=4.8 && <4.9
   hs-source-dirs:      src
-  default-language:    Type-savvy Haskell
+--  default-language:    Type-savvy Haskell
