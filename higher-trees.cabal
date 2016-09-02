@@ -20,6 +20,6 @@ library
   exposed-modules:     Tree
   -- other-modules:       
   other-extensions:    UndecidableInstances, InstanceSigs, KindSignatures, FlexibleContexts, FlexibleInstances, StandaloneDeriving, DeriveFunctor, DataKinds, GADTs, RankNTypes
-  build-depends:       base >=4.8 && <4.9
+  build-depends:       base >=4.8 && <4.10
   hs-source-dirs:      src
 --  default-language:    Type-savvy Haskell
