@@ -19,7 +19,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Tree
   -- other-modules:       
-  other-extensions:    UndecidableInstances, InstanceSigs, KindSignatures, FlexibleContexts, FlexibleInstances, StandaloneDeriving, DeriveFunctor, DataKinds, GADTs, RankNTypes
+  other-extensions:    UndecidableInstances, FlexibleContexts, FlexibleInstances, DeriveFunctor, DataKinds, GADTs
   build-depends:       base >=4.8 && <4.10
   hs-source-dirs:      src
 --  default-language:    Type-savvy Haskell
