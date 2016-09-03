@@ -1,3 +1,4 @@
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
 {-# LANGUAGE DeriveFunctor, DataKinds, GADTs #-}
@@ -129,5 +130,10 @@ instance HComonad HTree where
 -- * Complexes
 -- these are /categories without identity/
 
---data Complex :: (* -> * -> *) -> * -> * -> * where
---  Comp :: Complex (p f) (f m) (f n) -> p f (S n) -> Complex (p f) (f m) (f (S n))
+-- ** =data= definition
+-- for now just chain by dimension,
+-- later we'll want to /bond/ by tree shapes
+data Complex :: (Peano -> * -> *) -> Peano -> Peano -> * where
+  Comp :: Complex HTree m n -> HTree n a -> Complex HTree m (S n)
+
+-- we'll also want to concatenate, etc. (regarding a complex as a cell?)
