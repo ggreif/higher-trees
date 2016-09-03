@@ -105,9 +105,7 @@ instance Foldable (HTree Z) where
 
 instance Foldable (HTree n) => Foldable (HTree (S n)) where
   foldMap _ HLeaf = mempty
-  foldMap f (a `Branch` t) = f a `mappend` foldMap go t
-    where go HLeaf = mempty
-          go (b `Branch` u) = f b `mappend` foldMap go u
+  foldMap f (a `Branch` t) = f a `mappend` foldMap (foldMap f) t
 
 -- *** Extrude
 
@@ -126,3 +124,10 @@ instance HComonad HTree where
   extract (a `Branch` _) = a
   duplicate (_ `Branch` r) = r
   -- duplicate l@HLeaf = undefined `Branch` _
+
+
+-- * Complexes
+-- these are /categories without identity/
+
+--data Complex :: (* -> * -> *) -> * -> * -> * where
+--  Comp :: Complex (p f) (f m) (f n) -> p f (S n) -> Complex (p f) (f m) (f (S n))
