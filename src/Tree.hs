@@ -126,6 +126,10 @@ instance HComonad HTree where
   duplicate (_ `Branch` r) = r
   -- duplicate l@HLeaf = undefined `Branch` _
 
+-- * Decorations
+-- Eric Finster calls these /bonds/ in http://opetopic.net/docs/diagrams/complexes
+
+-- ** Add a card under the whole tree (all its nodes)
 
 -- * Complexes
 -- these are /categories without identity/
