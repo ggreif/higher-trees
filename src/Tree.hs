@@ -137,10 +137,34 @@ data Complex :: (Peano -> * -> *) -> Peano -> Peano -> * where
 
 -- * Visualize
 
-visualize :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
-visualize = go
+-- left side of each zoom is a graphical tree
+visualizeL :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
+visualizeL = go
   where go :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
         go Leaf = circle 10
-        go (img `Branch` ts) = (img <> foldMap go ts) === regPoly 4 30
+        go (img `Branch` ts) = foldMap go ts === strut unitY === (img <> regPoly 4 30)
 
-main = mainWith (visualize $ (const (circle 3 # fc black)) <$> t213)
+-- right side of each zoom is a stack of cards
+-- but they are actually come from the dimension above
+visualizeR :: HTree (S Z) (Diagram B) -> Diagram B
+visualizeR tr = toDiag (go tr)
+  where go :: HTree (S Z) (Diagram B) -> Sum Int
+        go Leaf = mempty
+        --go (img `Branch` ts) = foldMap go ts # frame 5 <> regPoly 4 30
+        go (img `Branch` ts) = foldMap go ts <> Sum 1
+        toDiag :: Sum Int -> Diagram B
+        toDiag (Sum 0) = circle 2 # fc yellow
+        toDiag (Sum n) = regPoly 4 (fromIntegral n * 10) <> toDiag (Sum $ n - 1)
+
+-- stacking l above r with operation (|=|)
+--data Cards = Cards { (|=|) :: Diagram B -> Diagram B -> Diagram B, l, r :: Diagram B }
+data Cards = Cards { l, r :: Diagram B }
+
+instance Semigroup Cards where
+  --
+
+instance Monoid Cards where
+  mempty = Cards mempty mempty
+  mappend = undefined -- Cards
+
+main = mainWith (visualizeR $ (const (circle 3 # fc black)) <$> t213)
