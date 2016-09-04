@@ -167,4 +167,4 @@ instance Monoid Cards where
   mempty = Cards mempty mempty
   mappend = undefined -- Cards
 
-main = mainWith (visualizeR $ (const (circle 3 # fc black)) <$> t213)
+main = mainWith ((visualizeR $ (const (circle 3 # fc black)) <$> t213) ||| strutX 4 ||| (visualizeL $ (const (circle 3 # fc black)) <$> t213))
