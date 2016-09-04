@@ -6,7 +6,7 @@ Haskell library for higher dimensional trees
 ## Courtesy of [MuniHac2016](http://munihac.de/)
 
 Image credit: http://opetopic.net
-[A 3-dimensional tree](http://opetopic.net/assets/svgs/3dboxtree.svg)
+[![A 3-dimensional tree](http://opetopic.net/assets/svgs/3dboxtree.svg)]
 
 # Background
 
