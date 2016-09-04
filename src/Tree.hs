@@ -7,6 +7,8 @@ module Tree where
 
 --import Control.Comonad
 import Data.Foldable
+import Diagrams.Prelude
+import Diagrams.Backend.SVG.CmdLine
 
 -- * A non-empty rose tree
 -- We'll want to map the top-dimensional part of our
@@ -131,3 +133,14 @@ data Complex :: (Peano -> * -> *) -> Peano -> Peano -> * where
   Comp :: Complex HTree m n -> HTree n a -> Complex HTree m (S n)
 
 -- we'll also want to concatenate, etc. (regarding a complex as a cell?)
+
+
+-- * Visualize
+
+visualize :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
+visualize = go
+  where go :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
+        go Leaf = circle 10
+        go (img `Branch` ts) = (img <> foldMap go ts) === regPoly 4 30
+
+main = mainWith (visualize $ (const (circle 3 # fc black)) <$> t213)
