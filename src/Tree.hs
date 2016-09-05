@@ -34,6 +34,7 @@ data Peano = Z | S Peano
 --
 data HTree n a where
   Point :: a -> HTree Z a
+  --Drop :: HTree n a -> HTree (S (S n)) a
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
