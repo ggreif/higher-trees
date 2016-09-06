@@ -1,5 +1,5 @@
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
+{-# LANGUAGE TypeOperators, KindSignatures #-}
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
 {-# LANGUAGE DeriveFunctor, DataKinds, GADTs #-}
 
@@ -16,7 +16,14 @@ import Diagrams.Backend.SVG.CmdLine
 --
 data RTree a = RLeaf | a `RBranch` [RTree a] deriving (Eq, Show)
 
---instance Comonad RTree where
+-- corresponding singleton type
+data RTree' :: RTree () -> * -> * where
+  RLeaf' :: RTree' RLeaf a
+  RNil' :: a -> RTree' (RBranch '() '[]) a -- no fan-ins yet
+  RCons' :: RTree' b a -> RTree' (RBranch '() bs) a -> RTree' (RBranch '() (b ': bs)) a -- add a fan-in
+
+
+--instance Comonad RTree' (x `RBranch` tr) where
   --extract
 
 -- * Higher tree
