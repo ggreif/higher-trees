@@ -1,7 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE TypeOperators, KindSignatures #-}
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
-{-# LANGUAGE DeriveFunctor, DataKinds, GADTs #-}
+{-# LANGUAGE DeriveFunctor, DataKinds, GADTs, StandaloneDeriving #-}
 
 module Tree where
 
@@ -21,6 +21,20 @@ data RTree' :: RTree () -> * -> * where
   RLeaf' :: RTree' RLeaf a
   RNil' :: a -> RTree' (RBranch '() '[]) a -- no fan-ins yet
   RCons' :: RTree' b a -> RTree' (RBranch '() bs) a -> RTree' (RBranch '() (b ': bs)) a -- add a fan-in
+
+deriving instance Show a => Show (RTree' i a)
+-- ** We can hide the type index
+data Hidden :: * -> * where
+  Hide :: RTree' i a -> Hidden a
+
+-- now convert!
+
+toHidden :: RTree a -> Hidden a
+toHidden RLeaf = Hide RLeaf'
+toHidden (a `RBranch` []) = Hide (RNil' a)
+toHidden (a `RBranch` (t:ts)) = case (toHidden t, toHidden (a `RBranch` ts)) of
+                                  (Hide t', Hide ts'@(RNil' _)) -> Hide (t' `RCons'` ts')
+                                  (Hide t', Hide ts'@(_ `RCons'` _)) -> Hide (t' `RCons'` ts')
 
 
 --instance Comonad RTree' (x `RBranch` tr) where
