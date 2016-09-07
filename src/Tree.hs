@@ -27,14 +27,23 @@ deriving instance Show a => Show (RTree' i a)
 data Hidden :: * -> * where
   Hide :: RTree' i a -> Hidden a
 
+deriving instance Show a => Show (Hidden a)
+
 -- now convert!
 
 toHidden :: RTree a -> Hidden a
 toHidden RLeaf = Hide RLeaf'
 toHidden (a `RBranch` []) = Hide (RNil' a)
-toHidden (a `RBranch` (t:ts)) = case (toHidden t, toHidden (a `RBranch` ts)) of
-                                  (Hide t', Hide ts'@(RNil' _)) -> Hide (t' `RCons'` ts')
-                                  (Hide t', Hide ts'@(_ `RCons'` _)) -> Hide (t' `RCons'` ts')
+toHidden (a `RBranch` (t:ts)) = case toHidden t of
+                                  Hide t' -> case toHidden (a `RBranch` ts) of
+                                    Hide ts'@(RNil' _) -> Hide (t' `RCons'` ts')
+                                    Hide ts'@(_ `RCons'` _) -> Hide (t' `RCons'` ts')
+-- and back...
+fromHidden :: Hidden a -> RTree a
+fromHidden (Hide RLeaf') = RLeaf
+fromHidden (Hide (RNil' a)) = a `RBranch` []
+fromHidden (Hide (t `RCons'` ts)) = a `RBranch` (fromHidden (Hide t) : ts')
+  where a `RBranch` ts' = fromHidden (Hide ts)
 
 
 --instance Comonad RTree' (x `RBranch` tr) where
