@@ -18,3 +18,43 @@ calculus.
 
 Higher dimensional trees are *almost* opetopes. They must have exactly
 one cell in codimension 0 to qualify as such.
+
+# Decorating
+
+An n-dimensional tree can be *decorated* to obtain an
+(n+1)-dimensional tree.
+
+## Pointing
+
+Point at an non-empty set {b0 .. bn} of boxes. These can be thought of
+as a *monoid*: they determine the smallest subtree that encompasses
+all those boxes.
+
+The closure property is the following: if neither is
+a predecessor of the other, then the monoid operation includes the
+highest common predecessor (dominator) an all the boxes in-between.
+
+What we get is a semi-lattice, a commutative idempotent monoid. Unit
+is the empty pointed set.
+
+## Sticking cards
+
+When we have such a subtree, we can stick a card below it. For the
+next round this becomes another box we can `mappend` to. All
+encompassed boxes of the card are removed from the pointable set
+(i.e. become `mempty`). They are still accessible for *sprouting* as
+that process creates new boxes *outside of the card*.
+
+The cards encompass an n-dimensional branching structure, thus giving
+rise to an (n+1)-dimensional tree (a *branch* of it). In fact the card
+*cuts out* a subtree of the n-dimensional original tree.
+
+By collapsing the card to a box, the original tree gives rise to a new
+n-dimensional tree that is (possibly) smaller. This process can be
+considered an *inverse substitution*.
+
+## Zippers
+
+The term *pointing* is made precise by the data structure of the
+*zipper*. In this case it is a path from the root leading to the box
+we point at.
