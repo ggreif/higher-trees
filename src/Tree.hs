@@ -70,15 +70,15 @@ data HTree n a where
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
 
-data HTree' :: Peano -> HTree (S Z) () -> * -> * where
-  Point' :: a -> HTree' Z (Branch '() (Point Leaf)) a
+data HTree' :: Peano -> HTree (S Z) (HTree (S (S Z)) ()) -> * -> * where
+  Point' :: a -> HTree' Z (Branch Leaf (Point Leaf)) a
   Leaf' :: HTree' (S n) Leaf a
   --Branch' :: a
   --        -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
   --        -> HTree' (S (S Z)) (RBranch '() '[]) a
-  Nil' :: a -> HTree' (S (S Z)) (Branch '() (Point Leaf)) a -- no fan-ins yet
+  Nil' :: a -> HTree' (S (S Z)) (Branch Leaf (Point Leaf)) a -- no fan-ins yet
 {-
-  Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (RBranch '() bs) a -> HTree' (S (S Z)) (RBranch '() (b ': bs)) a -- add a fan-in
+  Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (Point bs) a -> HTree' (S (S Z)) (Branch '() (b ': bs)) a -- add a fan-in
 
 
 h1 = Nil' 'a'
