@@ -88,9 +88,15 @@ h2x (a `Branch` Leaf) = Xoint a
 --                                                    ts'@(Point p) -> h2x (a `Branch` _)
 
 
+--data HTree' (n :: Peano) (a :: *) :: (S p ~ n) => Maybe (HTree p (HTree n a)) -> * where
+data HTree' (n :: Peano) (a :: *) :: Maybe (HTree (P n) (HTree n a)) -> * where
+  Point' :: a -> HTree' Z a Nothing
+  Leaf' :: HTree' (S n) a Nothing
+  Branch' :: a -> HTree' n (HTree (S n) a) (Just stru) -> HTree' (S n) a (Just (Branch x stru))
+
 
 type family P (n :: Peano) where
-  P Z = Z
+  --P Z = Z
   P (S n) = n
 
 {- MAYBE LATER
