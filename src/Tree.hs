@@ -92,7 +92,8 @@ h2x (a `Branch` Leaf) = Xoint a
 data HTree' (n :: Peano) (a :: *) :: Maybe (HTree (P n) (HTree n a)) -> * where
   Point' :: a -> HTree' Z a Nothing
   Leaf' :: HTree' (S n) a Nothing
-  Branch' :: a -> HTree' n (HTree (S n) a) (Just stru) -> HTree' (S n) a (Just (Branch x stru))
+  --Branch' :: (P (S n) ~ S (P n)) => a -> HTree' n (HTree (S n) a) (Just stru) -> HTree' (S n) a (Just (Branch x stru))
+  Branch' ::  a -> HTree' (S n) (HTree (S (S n)) a) (Just stru) -> HTree' (S (S n)) a (Just (Branch x stru))
 
 
 type family P (n :: Peano) where
