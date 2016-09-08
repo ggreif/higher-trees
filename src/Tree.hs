@@ -70,21 +70,42 @@ data HTree n a where
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
+-- establish a less brittle isomorphic structure to HTree:
+
+data XTree n a where
+  Xoint :: a -> XTree n a
+  Xeaf :: XTree (S n) a
+  Xranch :: XTree (S n) a -> XTree n (XTree (S n) a) -> XTree (S n) a
+
+-- here is the natural transformation HTree --> XTree:
+
+h2x :: HTree n a -> XTree n a
+h2x (Point a) = Xoint a
+h2x Leaf = Xeaf
+h2x (a `Branch` Point t) = h2x t `Xranch` Xoint (Xoint a)
+h2x (a `Branch` Leaf) = Xoint a
+--h2x (a `Branch` (t `Branch` ts)) = h2x t `Xranch` case ts of
+--                                                    ts'@(Point p) -> h2x (a `Branch` _)
+
+
+
 type family P (n :: Peano) where
   P Z = Z
   P (S n) = n
 
---data HTree' :: Peano -> HTree (S Z) (HTree (S (S Z)) ()) -> * -> * where
---data HTree' (n :: Peano) :: (n ~ S n') => HTree n' (HTree n ()) -> * -> * where
-data HTree' (n :: Peano) :: HTree (P n) (HTree n ()) -> * -> * where
-  --Point' :: a -> HTree' Z (Branch Leaf (Point Leaf)) a
-  Point' :: a -> HTree' Z (Point (Point '())) a
-  --Point' :: a -> HTree' Z x a -- also OK
-  Leaf' :: HTree' (S n) x a
-  Branch' :: a
-          -> HTree' (S Z) branching (HTree (S (S Z)) a)
-          -> HTree' (S (S Z)) branching a
+{- MAYBE LATER
+data Zoom (n :: Peano) :: RTree () -> RTree () -> * -> * where
+  Empty :: RTree' (RBranch '() os) a -> Zoom n (RBranch '() os) RLeaf a
+  
+-}
+
 {-
+data HTree' (n :: Peano) :: Maybe [HTree n *] -> * -> * where
+  Point' :: a -> HTree' Z (Just '[]) a
+  Leaf' :: HTree' (S n) Nothing a
+  Branch' :: a
+          -> HTree' n branching (HTree (S n) a)
+          -> HTree' (S n) (RBranch a branching) a
   Nil' :: a -> HTree' (S (S Z)) (Branch Leaf (Point Leaf)) a -- no fan-ins yet
   Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (Point bs) a -> HTree' (S (S Z)) (Branch '() (b ': bs)) a -- add a fan-in
 
