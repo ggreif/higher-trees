@@ -68,6 +68,14 @@ data HTree n a where
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
+
+data HTree' :: Peano -> RTree () -> * -> * where
+  Point' :: a -> HTree' Z (RBranch '() '[]) a
+  Leaf' :: HTree' (S n) RLeaf a
+  Branch' :: a
+          -> HTree n (HTree' (S n) (RBranch '() '[]) a)
+          -> HTree' (S n) (RBranch '() '[]) a
+
 -- *** =Show= ing
 instance Show a => Show (HTree Z a) where
   show (Point a) = "Point (" ++ show a ++ ")"
