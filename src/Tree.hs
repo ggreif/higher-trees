@@ -70,29 +70,10 @@ data HTree n a where
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
--- establish a less brittle isomorphic structure to HTree:
 
-data XTree n a where
-  Xoint :: a -> XTree n a
-  Xeaf :: XTree (S n) a
-  Xranch :: XTree (S n) a -> XTree n (XTree (S n) a) -> XTree (S n) a
-
--- here is the natural transformation HTree --> XTree:
-
-h2x :: HTree n a -> XTree n a
-h2x (Point a) = Xoint a
-h2x Leaf = Xeaf
-h2x (a `Branch` Point t) = h2x t `Xranch` Xoint (Xoint a)
-h2x (a `Branch` Leaf) = Xoint a
---h2x (a `Branch` (t `Branch` ts)) = h2x t `Xranch` case ts of
---                                                    ts'@(Point p) -> h2x (a `Branch` _)
-
-
---data HTree' (n :: Peano) (a :: *) :: (S p ~ n) => Maybe (HTree p (HTree n a)) -> * where
 data HTree' (n :: Peano) (a :: *) :: Maybe (HTree (P n) (HTree n a)) -> * where
   Point' :: a -> HTree' Z a Nothing
   Leaf' :: HTree' (S n) a Nothing
-  --Branch' :: (P (S n) ~ S (P n)) => a -> HTree' n (HTree (S n) a) (Just stru) -> HTree' (S n) a (Just (Branch x stru))
   Branch' ::  a -> HTree' (S n) (HTree (S (S n)) a) (Just stru) -> HTree' (S (S n)) a (Just (Branch x stru))
 
 
