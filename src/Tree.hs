@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE TypeInType, TypeOperators, KindSignatures #-}
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
@@ -69,15 +70,22 @@ data HTree n a where
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
+type family P (n :: Peano) where
+  P Z = Z
+  P (S n) = n
 
-data HTree' :: Peano -> HTree (S Z) (HTree (S (S Z)) ()) -> * -> * where
-  Point' :: a -> HTree' Z (Branch Leaf (Point Leaf)) a
-  Leaf' :: HTree' (S n) Leaf a
-  --Branch' :: a
-  --        -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
-  --        -> HTree' (S (S Z)) (RBranch '() '[]) a
-  Nil' :: a -> HTree' (S (S Z)) (Branch Leaf (Point Leaf)) a -- no fan-ins yet
+--data HTree' :: Peano -> HTree (S Z) (HTree (S (S Z)) ()) -> * -> * where
+--data HTree' (n :: Peano) :: (n ~ S n') => HTree n' (HTree n ()) -> * -> * where
+data HTree' (n :: Peano) :: HTree (P n) (HTree n ()) -> * -> * where
+  --Point' :: a -> HTree' Z (Branch Leaf (Point Leaf)) a
+  Point' :: a -> HTree' Z (Point (Point '())) a
+  --Point' :: a -> HTree' Z x a -- also OK
+  Leaf' :: HTree' (S n) x a
+  Branch' :: a
+          -> HTree' (S Z) branching (HTree (S (S Z)) a)
+          -> HTree' (S (S Z)) branching a
 {-
+  Nil' :: a -> HTree' (S (S Z)) (Branch Leaf (Point Leaf)) a -- no fan-ins yet
   Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (Point bs) a -> HTree' (S (S Z)) (Branch '() (b ': bs)) a -- add a fan-in
 
 
