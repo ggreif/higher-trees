@@ -1,10 +1,11 @@
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
-{-# LANGUAGE TypeOperators, KindSignatures #-}
+{-# LANGUAGE TypeInType, TypeOperators, KindSignatures #-}
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
 {-# LANGUAGE DeriveFunctor, DataKinds, GADTs, StandaloneDeriving #-}
 
 module Tree where
 
+import Data.Kind
 --import Control.Comonad
 import Data.Foldable
 --import Diagrams.Prelude
@@ -69,8 +70,9 @@ data HTree n a where
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
 
-data HTree' :: Peano -> RTree () -> * -> * where
-  Point' :: a -> HTree' Z (RBranch '() '[]) a
+data HTree' :: Peano -> HTree (S Z) () -> * -> * where
+  Point' :: a -> HTree' Z (Branch '() (Point Leaf)) a
+  {-
   Leaf' :: HTree' (S n) RLeaf a
   --Branch' :: a
   --        -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
@@ -78,10 +80,12 @@ data HTree' :: Peano -> RTree () -> * -> * where
   Nil' :: a -> HTree' (S (S Z)) (RBranch '() '[]) a -- no fan-ins yet
   Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (RBranch '() bs) a -> HTree' (S (S Z)) (RBranch '() (b ': bs)) a -- add a fan-in
 
+
 h1 = Nil' 'a'
 h1'1 = Nil' 'c' `Cons'` h1
 h1'2 = Nil' 'b' `Cons'` h1'1
 h1'3 = Leaf' `Cons'` h1'2
+-}
 
 
 -- *** =Show= ing
