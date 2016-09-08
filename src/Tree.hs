@@ -73,8 +73,8 @@ data HTree' :: Peano -> RTree () -> * -> * where
   Point' :: a -> HTree' Z (RBranch '() '[]) a
   Leaf' :: HTree' (S n) RLeaf a
   Branch' :: a
-          -> HTree n (HTree' (S n) (RBranch '() '[]) a)
-          -> HTree' (S n) (RBranch '() '[]) a
+          -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
+          -> HTree' (S (S Z)) (RBranch '() '[]) a
 
 -- *** =Show= ing
 instance Show a => Show (HTree Z a) where
