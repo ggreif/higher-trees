@@ -7,8 +7,8 @@ module Tree where
 
 --import Control.Comonad
 import Data.Foldable
-import Diagrams.Prelude
-import Diagrams.Backend.SVG.CmdLine
+--import Diagrams.Prelude
+--import Diagrams.Backend.SVG.CmdLine
 
 -- * A non-empty rose tree
 -- We'll want to map the top-dimensional part of our
@@ -72,9 +72,17 @@ data HTree n a where
 data HTree' :: Peano -> RTree () -> * -> * where
   Point' :: a -> HTree' Z (RBranch '() '[]) a
   Leaf' :: HTree' (S n) RLeaf a
-  Branch' :: a
-          -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
-          -> HTree' (S (S Z)) (RBranch '() '[]) a
+  --Branch' :: a
+  --        -> HTree' (S Z) (RBranch '() rt) (HTree' (S n) rts a)
+  --        -> HTree' (S (S Z)) (RBranch '() '[]) a
+  Nil' :: a -> HTree' (S (S Z)) (RBranch '() '[]) a -- no fan-ins yet
+  Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (RBranch '() bs) a -> HTree' (S (S Z)) (RBranch '() (b ': bs)) a -- add a fan-in
+
+h1 = Nil' 'a'
+h1'1 = Nil' 'c' `Cons'` h1
+h1'2 = Nil' 'b' `Cons'` h1'1
+h1'3 = Leaf' `Cons'` h1'2
+
 
 -- *** =Show= ing
 instance Show a => Show (HTree Z a) where
@@ -175,7 +183,7 @@ data Complex :: (Peano -> * -> *) -> Peano -> Peano -> * where
 
 
 -- * Visualize
-
+{-
 -- left side of each zoom is a graphical tree
 visualizeL :: (Diagram B ~ a) => HTree (S Z) a -> Diagram B
 visualizeL = go
@@ -199,7 +207,7 @@ visualizeR tr = toDiag (go tr)
 --data Cards = Cards { (|=|) :: Diagram B -> Diagram B -> Diagram B, l, r :: Diagram B }
 data Cards = Cards { l, r :: Diagram B }
 
-instance Semigroup Cards where
+--instance Semigroup Cards where
   --
 
 instance Monoid Cards where
@@ -207,3 +215,4 @@ instance Monoid Cards where
   mappend = undefined -- Cards
 
 main = mainWith ((visualizeR $ (const (circle 3 # fc black)) <$> t213) ||| strutX 4 ||| (visualizeL $ (const (circle 3 # fc black)) <$> t213))
+-}
