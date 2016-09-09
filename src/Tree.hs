@@ -12,7 +12,7 @@ import Data.Foldable
 --import Diagrams.Prelude
 --import Diagrams.Backend.SVG.CmdLine
 
--- * A non-empty rose tree
+-- * A rose tree
 -- We'll want to map the top-dimensional part of our
 -- higher-dimensional trees to these.
 --
