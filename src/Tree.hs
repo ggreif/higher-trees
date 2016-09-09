@@ -74,7 +74,22 @@ data HTree n a where
 data HTree' n a :: HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
-  Branch' :: a -> HTree' (S n) (HTree (S (S n)) a) stru -> HTree' (S (S n)) a (Branch x stru)
+  Branch' :: a -> HTree' n (HTree (S n) a) stru -> HTree' (S n) a (Branch x stru)
+
+
+data Tidden :: Peano -> * -> * where
+  Tide :: HTree' n a s -> Tidden n a
+
+-- now convert!
+
+toTidden :: HTree n a -> Tidden n a
+toTidden (Point a) = Tide (Point' a)
+toTidden Leaf = Tide Leaf'
+
+-- and back...
+fromTidden :: Tidden n a -> HTree n a
+fromTidden (Tide (Point' a)) = Point a
+fromTidden (Tide Leaf') = Leaf
 
 
 {- MAYBE LATER
@@ -125,6 +140,11 @@ t213 = 1 `Branch` Point (2 `Branch` Point (3 `Branch` Point Leaf))
 t3, t313 :: HTree (S (S Z)) Char
 t3 = 'a' `Branch` (('b' `Branch` Leaf) `Branch` Point Leaf)
 t313 = 'a' `Branch` (Leaf `Branch` Point (('b' `Branch` Leaf) `Branch` Point (Leaf `Branch` Point Leaf)))
+
+ti2 :: HTree' (S Z) Int (w `Branch` Point Leaf)
+ti2 = 1 `Branch'` Point' Leaf
+
+
 
 -- ** TODO
 -- - extrude
