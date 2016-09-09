@@ -143,6 +143,8 @@ t313 = 'a' `Branch` (Leaf `Branch` Point (('b' `Branch` Leaf) `Branch` Point (Le
 
 ti2 :: HTree' (S Z) Int (w `Branch` Point Leaf)
 ti2 = 1 `Branch'` Point' Leaf
+ti21 :: HTree' ('S 'Z) Integer (w `Branch` Point x)
+ti21 = 1 `Branch'` Point' (2 `Branch` Point Leaf)
 
 
 
