@@ -71,9 +71,9 @@ data HTree n a where
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
 
-data HTree' (n :: Peano) (a :: *) :: HTree (P n) (HTree n a) -> * where
-  Point' :: a -> HTree' Z a stru
-  Leaf' :: HTree' (S n) a stru
+data HTree' (n :: Peano) (a :: *) :: HTree n a -> * where
+  Point' :: a -> HTree' Z a (Point x)
+  Leaf' :: HTree' (S n) a Leaf
   Branch' :: a -> HTree' (S n) (HTree (S (S n)) a) stru -> HTree' (S (S n)) a (Branch x stru)
 
 
