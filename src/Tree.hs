@@ -71,15 +71,11 @@ data HTree n a where
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
 
-data HTree' (n :: Peano) (a :: *) :: HTree n a -> * where
+data HTree' n a :: HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
   Branch' :: a -> HTree' (S n) (HTree (S (S n)) a) stru -> HTree' (S (S n)) a (Branch x stru)
 
-
-type family P (n :: Peano) where
-  --P Z = Z
-  P (S n) = n
 
 {- MAYBE LATER
 data Zoom (n :: Peano) :: RTree () -> RTree () -> * -> * where
@@ -88,15 +84,6 @@ data Zoom (n :: Peano) :: RTree () -> RTree () -> * -> * where
 -}
 
 {-
-data HTree' (n :: Peano) :: Maybe [HTree n *] -> * -> * where
-  Point' :: a -> HTree' Z (Just '[]) a
-  Leaf' :: HTree' (S n) Nothing a
-  Branch' :: a
-          -> HTree' n branching (HTree (S n) a)
-          -> HTree' (S n) (RBranch a branching) a
-  Nil' :: a -> HTree' (S (S Z)) (Branch Leaf (Point Leaf)) a -- no fan-ins yet
-  Cons' :: HTree' (S (S Z)) b a -> HTree' (S (S Z)) (Point bs) a -> HTree' (S (S Z)) (Branch '() (b ': bs)) a -- add a fan-in
-
 
 h1 = Nil' 'a'
 h1'1 = Nil' 'c' `Cons'` h1
