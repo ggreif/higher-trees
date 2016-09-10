@@ -74,7 +74,6 @@ data HTree n a where
 data HTree' n a :: HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
-  --Branch' :: a -> HTree' n (HTree (S n) a) stru -> HTree' (S n) a (Branch x stru)
   Branch' :: a -> HTree'' n (HTree' (S n) a) stru -> HTree' (S n) a (x `Branch` stru)
 
 
@@ -83,7 +82,7 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   Point'' :: f i -> HTree'' Z f (Point i)
   Leaf'' :: HTree'' (S n) f Leaf
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
-  Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
+  -- BUG REPORT NEEDED?  Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
 
   Extrude0 :: f (t2 `Branch` Point Leaf) -> HTree'' Z f (Point struct1) -> HTree'' Z f (Point (t2 `Branch` Point struct1))
   Extrude :: f i -> HTree'' (S n) f struct -> HTree'' (S n) f (i `Branch` (n `Terminal` struct))
