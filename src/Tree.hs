@@ -93,7 +93,9 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
 e0 = Extrude0 (Leaf' `Branch'` Point'' Leaf') (Point'' Leaf')
 e0' = Extrude0 (Leaf' `Branch'` Point'' Leaf') e0
 
-f1 = 'a' `Branch'` (Point'' Leaf')
+f1 :: HTree' (S Z) Char (Branch f1 (Point Leaf))
+f1 = '1' `Branch'` (Point'' Leaf')
+f1a :: HTree' (S Z) Char (Branch z (Point (Branch z (Point Leaf))))
 f1a = 'a' `Branch'` (Point'' f1)
 f1ab = 'b' `Branch'` (Point'' f1a)
 f1abE = 'e' `Branch'` (Extrude0 f1 (Point'' f1ab))
