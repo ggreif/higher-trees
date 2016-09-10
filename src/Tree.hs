@@ -80,8 +80,8 @@ data HTree' n a :: HTree n a -> * where
 
 -- similarly one that takes the presheaf
 data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
-  --Point'' :: a -> HTree'' Z a (Point x)
-  --Leaf'' :: HTree'' (S n) a Leaf
+  Point'' :: f i -> HTree'' Z f (Point i)
+  Leaf'' :: HTree'' (S n) f Leaf
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
   Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
 
