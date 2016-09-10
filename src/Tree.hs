@@ -74,7 +74,15 @@ data HTree n a where
 data HTree' n a :: HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
-  Branch' :: a -> HTree' n (HTree (S n) a) stru -> HTree' (S n) a (Branch x stru)
+  --Branch' :: a -> HTree' n (HTree (S n) a) stru -> HTree' (S n) a (Branch x stru)
+  Branch' :: a -> HTree'' n (HTree' (S n) a) stru -> HTree' (S n) a (Branch x stru)
+
+
+-- similarly one that takes the presheaf
+data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
+  --Point'' :: a -> HTree'' Z a (Point x)
+  --Leaf'' :: HTree'' (S n) a Leaf
+  --Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` x)
 
 
 data Tidden :: Peano -> * -> * where
@@ -141,11 +149,14 @@ t3, t313 :: HTree (S (S Z)) Char
 t3 = 'a' `Branch` (('b' `Branch` Leaf) `Branch` Point Leaf)
 t313 = 'a' `Branch` (Leaf `Branch` Point (('b' `Branch` Leaf) `Branch` Point (Leaf `Branch` Point Leaf)))
 
+{-
 ti2 :: HTree' (S Z) Int (w `Branch` Point Leaf)
 ti2 = 1 `Branch'` Point' Leaf
 ti21 :: HTree' ('S 'Z) Integer (w `Branch` Point x)
 ti21 = 1 `Branch'` Point' (2 `Branch` Point Leaf)
-
+ti213 :: HTree' ('S 'Z) Integer (w `Branch` Point x)
+ti213 = 1 `Branch'` Point' (2 `Branch` Point (3 `Branch` Point Leaf))
+-}
 
 
 -- ** TODO
