@@ -89,6 +89,8 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
 
   --Extrude :: f i3 -> HTree'' (S (S Z)) f (j3 `Branch` list1) -> HTree'' (S (S Z)) f (i3 `Branch` ((j3 `Branch` Leaf) `Branch` Point list1))
   Extrude :: f i3 -> HTree'' (S (S Z)) f struct -> HTree'' (S (S Z)) f (i3 `Branch` (struct `Branch` Point Leaf))
+  Extrude2 :: f i3 -> HTree'' (S (S Z)) f struct -> HTree'' (S (S Z)) f (i3 `Branch` (S Z `Terminal` struct))
+  ExtrudeN :: f i -> HTree'' (S n) f struct -> HTree'' (S n) f (i `Branch` (n `Terminal` struct))
 
 -- give me an n-dim tree that holds a single (n+1)-dim tree
 -- this is needed for extruding
