@@ -100,6 +100,9 @@ f1ab = 'b' `Branch'` (Point'' f1a)
 f1abE = 'e' `Branch'` (Extrude0 f1 (Point'' f1ab))
 
 
+g2 :: HTree' (S (S Z)) Char (Branch x ('Branch 'Leaf ('Point Leaf)))
+g2 = '2' `Branch'` (Extrude Leaf' Leaf'')
+
 -- * Terminal, etc. type families
 -- give me an n-dim tree that holds a single (n+1)-dim tree
 -- this is needed for extruding
