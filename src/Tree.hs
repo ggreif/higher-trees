@@ -94,8 +94,7 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
 -- it also corresponds to the terminal object
 type family Terminal n (t :: HTree (S n) a) :: HTree n (HTree (S n) a) where
   Z `Terminal` t = Point t
-  S Z `Terminal` t = t `Branch` Point Leaf
-  S (S n) `Terminal` t = t `Branch` Leaf
+  S n `Terminal` t = t `Branch` Empty n
 
 -- initial object does not exist in 0-dim:
 type family Initial n :: HTree (S n) a where
