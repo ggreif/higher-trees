@@ -85,8 +85,21 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
   Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
 
+  Extrude0 :: f (t2 `Branch` Point Leaf) -> HTree'' Z f (Point struct1) -> HTree'' Z f (Point (t2 `Branch` Point struct1))
   Extrude :: f i -> HTree'' (S n) f struct -> HTree'' (S n) f (i `Branch` (n `Terminal` struct))
 
+-- * Extrude0 tests
+
+e0 = Extrude0 (Leaf' `Branch'` Point'' Leaf') (Point'' Leaf')
+e0' = Extrude0 (Leaf' `Branch'` Point'' Leaf') e0
+
+f1 = 'a' `Branch'` (Point'' Leaf')
+f1a = 'a' `Branch'` (Point'' f1)
+f1ab = 'b' `Branch'` (Point'' f1a)
+f1abE = 'e' `Branch'` (Extrude0 f1 (Point'' f1ab))
+
+
+-- * Terminal, etc. type families
 -- give me an n-dim tree that holds a single (n+1)-dim tree
 -- this is needed for extruding
 -- it also corresponds to the terminal object
