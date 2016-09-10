@@ -75,14 +75,15 @@ data HTree' n a :: HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
   --Branch' :: a -> HTree' n (HTree (S n) a) stru -> HTree' (S n) a (Branch x stru)
-  Branch' :: a -> HTree'' n (HTree' (S n) a) stru -> HTree' (S n) a (Branch x stru)
+  Branch' :: a -> HTree'' n (HTree' (S n) a) stru -> HTree' (S n) a (x `Branch` stru)
 
 
 -- similarly one that takes the presheaf
 data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   --Point'' :: a -> HTree'' Z a (Point x)
   --Leaf'' :: HTree'' (S n) a Leaf
-  --Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` x)
+  ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
+  Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) stru
 
 
 data Tidden :: Peano -> * -> * where
