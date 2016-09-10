@@ -98,8 +98,14 @@ type family Terminal n (t :: HTree (S n) a) :: HTree n (HTree (S n) a) where
   S (S n) `Terminal` t = t `Branch` Leaf
 
 -- initial object does not exist in 0-dim:
-type family Initial n :: HTree n a where
-  Initial (S n) = Leaf
+type family Initial n :: HTree (S n) a where
+  Initial n = Leaf
+
+-- the empty tree of trees in the succeeding dimension
+-- i.e. it has no place for an 'a'
+type family Empty n :: HTree n (HTree (S n) a) where
+  Empty Z = Point Leaf
+  Empty (S n) = Leaf
 
 
 data Tidden :: Peano -> * -> * where
