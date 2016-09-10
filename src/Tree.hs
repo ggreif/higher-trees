@@ -87,7 +87,7 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
 
   Cons :: f i -> HTree'' (S Z) f rest -> HTree'' (S Z) f (i `Branch` Point rest)
 
-  --Extrude :: f i -> HTree'' (S (S Z)) f (j `Branch` list) -> HTree'' (S (S Z)) f (i `Branch` (j `Branch` Point list))
+  Extrude :: f i3 -> HTree'' (S (S Z)) f (j3 `Branch` list1) -> HTree'' (S (S Z)) f (i3 `Branch` ((j3 `Branch` Leaf) `Branch` Point list1))
 
 
 data Tidden :: Peano -> * -> * where
