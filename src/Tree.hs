@@ -85,6 +85,8 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
   Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
 
+  Branch2 :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' (S Z) f (i `Branch` Point (i `Branch` Point x)) -> HTree'' (S Z) f (i `Branch` Point x)
+
 
 data Tidden :: Peano -> * -> * where
   Tide :: HTree' n a s -> Tidden n a
