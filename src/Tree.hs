@@ -94,9 +94,9 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
 -- this is needed for extruding
 -- it also corresponds to the terminal object
 type family Terminal n (t :: HTree (S n) a) :: HTree n (HTree (S n) a) where
-  Terminal Z t = Point t
-  Terminal (S Z) t = t `Branch` Point Leaf
-  Terminal (S (S n)) t = t `Branch` Leaf
+  Z `Terminal` t = Point t
+  S Z `Terminal` t = t `Branch` Point Leaf
+  S (S n) `Terminal` t = t `Branch` Leaf
 
 
 data Tidden :: Peano -> * -> * where
