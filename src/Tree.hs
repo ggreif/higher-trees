@@ -85,8 +85,6 @@ data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
   Branch'' :: {-(f ~ HTree' (S n) a) => -} f i -> HTree'' n f stru -> HTree'' n f stru
 
-  Cons ::    f i -> HTree'' (S Z) f struct -> HTree'' (S Z) f (i `Branch` (Z `Terminal` struct))
-
   Extrude :: f i -> HTree'' (S n) f struct -> HTree'' (S n) f (i `Branch` (n `Terminal` struct))
 
 -- give me an n-dim tree that holds a single (n+1)-dim tree
