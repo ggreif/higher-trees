@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE TypeInType, TypeOperators, KindSignatures #-}
@@ -80,17 +81,18 @@ data STree (n :: Peano) (f :: a -> *) :: HTree n a -> * where
   SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
 
-data HTree' n a :: HTree n a -> * where
+--data HTree' (n :: Peano) (a :: *) :: HTree n a -> * where
+data HTree' (n :: Peano) :: forall (a :: *) . a -> HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
   Leaf' :: HTree' (S n) a Leaf
   Branch' :: a -> HTree'' n (HTree' (S n) a) stru -> HTree' (S n) a (x `Branch` stru)
 
 
 -- similarly one that takes the presheaf
-data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
+data HTree'' (n :: Peano) :: forall (a :: *) . (HTree (S n) (a :: *) -> *) -> HTree n (HTree (S n) a) -> * where
   Point'' :: f i -> HTree'' Z f (Point i)
   Leaf'' :: HTree'' (S n) f Leaf
-  --Branch'' :: f i -> HTree'' n ({-HTree'-}prox (S n) a) stru -> HTree'' (S n) f (i `Branch` stru)
+  Branch'' :: f i -> HTree'' n (HTree' (S n) a) stru -> HTree'' (S n) f (i `Branch` stru)
 
 
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
