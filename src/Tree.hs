@@ -74,7 +74,7 @@ data HTree n a where
 -- we need to be totally explicit about the kinds,
 -- so that no inference is attempted...
 data STree n :: forall a . (a -> *) -> HTree n a -> * where
-  SPoint :: a -> STree Z f (Point x)
+  SPoint :: f a -> STree Z f (Point a)
   SLeaf :: STree (S n) f Leaf
   SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
