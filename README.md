@@ -8,6 +8,14 @@ Haskell library for higher dimensional trees
 Image credit: http://opetopic.net
 [![A 3-dimensional tree](http://opetopic.net/assets/svgs/3dboxtree.svg)](http://opetopic.net)
 
+# Disclaimer
+
+This is not *yet* a library. Hopefully it will become one someday.
+Right now it is more of a playground for testing techniques how to deal
+with such objects in GHC. See e.g. the `singleton` branch for interesting
+type-level stuff (rather clumsy, I know). Also I have provoked GHC panics,
+so if you want to examine them, check out the `panic-*` branches.
+
 # Background
 
 Higher-dimensional trees are interesting objects of study in
