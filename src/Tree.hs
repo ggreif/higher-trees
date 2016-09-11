@@ -130,8 +130,9 @@ data Tidden :: Peano -> * -> * where
 toTidden :: HTree n a -> Tidden n a
 toTidden (Point a) = Tide (Point' a)
 toTidden Leaf = Tide Leaf'
-toTidden (a `Branch` stru) = Tide $ case toTidden stru of
-                                      Tide (Point' Leaf) -> a `Branch'` _
+--toTidden (a `Branch` stru) = Tide $ case toTidden stru of
+--                                      Tide (Point' Leaf) -> a `Branch'` _
+-- GHC bug: https://ghc.haskell.org/trac/ghc/ticket/12590
 
 -- and back...
 fromTidden :: Tidden n a -> HTree n a
