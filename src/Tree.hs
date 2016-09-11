@@ -71,13 +71,13 @@ data HTree n a where
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
 -- can we simply always pass the presheaf?
--- this would need polymorphic recursion in the kinds!
-data STree n :: (a -> *) -> HTree n a -> * where
+-- this needs polymorphic recursion in the kinds!
+-- we need to be totally explicit about the kinds,
+-- so that no inference is attempted...
+data STree (n :: Peano) (f :: a -> *) :: HTree n a -> * where
   SPoint :: a -> STree Z f (Point x)
   SLeaf :: STree (S n) f Leaf
-{-
-  SBranch :: a -> STree n (STree (S n) f) stru -> STree (S n) f stru'
--}
+  SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
 
 data HTree' n a :: HTree n a -> * where
@@ -90,7 +90,7 @@ data HTree' n a :: HTree n a -> * where
 data HTree'' n :: (HTree (S n) a -> *) -> HTree n (HTree (S n) a) -> * where
   Point'' :: f i -> HTree'' Z f (Point i)
   Leaf'' :: HTree'' (S n) f Leaf
-  Branch'' :: f i -> HTree'' n ({-HTree'-}prox (S n) a) stru -> HTree'' (S n) f (i `Branch` stru)
+  --Branch'' :: f i -> HTree'' n ({-HTree'-}prox (S n) a) stru -> HTree'' (S n) f (i `Branch` stru)
 
 
   ----Branch'' :: HTree' (S n) a i -> HTree'' n (HTree' (S n) a) stru -> HTree'' n (HTree' (S n) a) (i `Branch` stru)
