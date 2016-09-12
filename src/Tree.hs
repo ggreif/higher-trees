@@ -138,21 +138,15 @@ data Tidden :: forall k  . Peano -> (a -> *) -> * where
 
 -- now convert!
 
---type family Massage (f :: i -> *) :: i -> * where
---  Massage (HTree n) = STree n 
-
-toTidden :: forall n i (a :: i) (f :: i -> *) . Functor (HTree n) => HTree n (f a) -> Tidden n f
+toTidden :: HTree n (f a) -> Tidden n f
 toTidden (Point a) = Tide (SPoint a)
 toTidden Leaf = Tide SLeaf
-toTidden (a `Branch` (hmap toTidden -> stru :: HTree m (Tidden (S m) f)))
-                          = case nest stru :: Tidden m (STree (S m) f) of
-                               Tide stru' -> Tide $ a `SBranch` stru'
+toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
 
 nest :: HTree m (Tidden (S m) f) -> Tidden m (STree ('S m) f)
 nest (Point (Tide st)) = Tide (SPoint st)
 nest Leaf = Tide SLeaf
 nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
-
 
 hmap :: (x -> y) -> HTree n x -> HTree n y
 hmap f p@Point{} = fmap f p
