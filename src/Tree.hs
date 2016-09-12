@@ -1,7 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE RankNTypes, TypeInType, TypeOperators, KindSignatures #-}
-{-# LANGUAGE TypeFamilies, FlexibleContexts, FlexibleInstances #-}
-{-# LANGUAGE DeriveFunctor, DataKinds, GADTs, StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications, TypeFamilies, FlexibleContexts, FlexibleInstances #-}
+{-# LANGUAGE DeriveFunctor, DataKinds, GADTs, StandaloneDeriving, ScopedTypeVariables #-}
 
 module Tree where
 
@@ -133,23 +133,31 @@ type family Empty n :: HTree n (HTree (S n) a) where
   Empty (S n) = Leaf
 
 
-data Tidden :: Peano -> * -> * where
-  Tide :: HTree' n a s -> Tidden n a
+data Tidden :: forall k  . Peano -> (a -> *) -> * where
+  Tide :: STree n f s -> Tidden n f
 
 -- now convert!
 
-toTidden :: HTree n a -> Tidden n a
-toTidden (Point a) = Tide (Point' a)
-toTidden Leaf = Tide Leaf'
---toTidden (a `Branch` stru) = Tide $ case toTidden stru of
---                                      Tide (Point' Leaf) -> a `Branch'` _
--- GHC bug: https://ghc.haskell.org/trac/ghc/ticket/12590
+--type family Massage (f :: i -> *) :: i -> * where
+--  Massage (HTree n) = STree n 
+
+toTidden :: forall n i (a :: i) (f :: i -> *) . HTree n (f a) -> Tidden n f
+toTidden (Point a) = Tide (SPoint a)
+toTidden Leaf = Tide SLeaf
+toTidden (a `Branch` (stru :: (n ~ S m) => HTree m (HTree n (f (a :: i)))))
+                          = case toTidden stru :: Tidden m (HTree n) of
+                               --Tide s@(SPoint p) -> case toTidden p of Tide p' -> Tide $ a `SBranch` (SPoint p')
+                               Tide SLeaf -> Tide $ a `SBranch` SLeaf
+                               --Tide (a' `SBranch` tr) -> Tide $ a `SBranch` (a' `SBranch` tr)
+ -- where nest :: STree (S n2) (HTree (S n2)) (Branch a0 stru) -> STree (S n2) (STree (S (S n2)) f) _
+ --       nest = undefined
 
 -- and back...
+{-
 fromTidden :: Tidden n a -> HTree n a
 fromTidden (Tide (Point' a)) = Point a
 fromTidden (Tide Leaf') = Leaf
-
+-}
 
 {- MAYBE LATER
 data Zoom (n :: Peano) :: RTree () -> RTree () -> * -> * where
