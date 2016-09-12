@@ -149,12 +149,23 @@ toTidden (a `Branch` (hmap toTidden -> stru :: (n ~ S m) => HTree m (Tidden n f)
                                --Tide s@(SPoint p) -> case toTidden p of Tide p' -> Tide $ a `SBranch` (SPoint p')
                                Tide SLeaf -> Tide $ a `SBranch` SLeaf
                                --Tide (a' `SBranch` tr) -> Tide $ a `SBranch` (a' `SBranch` tr)
-                               Tide (nest -> Tide stru') -> Tide $ a `SBranch` stru'
+                               --Tide (nest -> Tide stru') -> Tide $ a `SBranch` stru'
 hmap :: (x -> y) -> HTree n x -> HTree n y
-hmap = undefined
+hmap f p@Point{} = fmap f p
+--hmap f l@Leaf = fmap f l
+--hmap f b@Branch{} = fmap f b
 
-nest :: STree n1 (Tidden ('S n1)) s -> Tidden n1 (STree ('S n1) f) -- STree n1 (STree ('S n1) f) s
-nest = undefined
+--nest :: STree n1 (Tidden ('S n1)) s -> Tidden n1 (STree ('S n1) f) -- STree n1 (STree ('S n1) f) s
+--nest (SPoint (Tide a)) = Tide $ SPoint a
+
+--nest' :: Tidden n1 (Tidden ('S n1)) -> Tidden n1 (STree ('S n1) f)
+--nest' (Tide (SPoint (Tide a))) = Tide $ SPoint a
+
+nest :: HTree m (Tidden (S m) f) -> Tidden m (STree ('S m) f)
+nest (Point (Tide st)) = Tide (SPoint st)
+nest Leaf = Tide SLeaf
+--nest (Tide a `Branch` tr) = Tide $ a `SBranch` _ (nest (hmap nest tr))
+nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 
 -- and back...
 {-
