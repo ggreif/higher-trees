@@ -1,5 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
-{-# LANGUAGE RankNTypes, TypeInType, TypeOperators, KindSignatures #-}
+{-# LANGUAGE RankNTypes, TypeInType, TypeOperators, KindSignatures, ViewPatterns #-}
 {-# LANGUAGE TypeApplications, TypeFamilies, FlexibleContexts, FlexibleInstances #-}
 {-# LANGUAGE DeriveFunctor, DataKinds, GADTs, StandaloneDeriving, ScopedTypeVariables #-}
 
@@ -144,13 +144,17 @@ data Tidden :: forall k  . Peano -> (a -> *) -> * where
 toTidden :: forall n i (a :: i) (f :: i -> *) . HTree n (f a) -> Tidden n f
 toTidden (Point a) = Tide (SPoint a)
 toTidden Leaf = Tide SLeaf
-toTidden (a `Branch` (stru :: (n ~ S m) => HTree m (HTree n (f (a :: i)))))
-                          = case toTidden stru :: Tidden m (HTree n) of
+toTidden (a `Branch` (hmap toTidden -> stru :: (n ~ S m) => HTree m (Tidden n f)))
+                          = case toTidden stru :: Tidden m (Tidden n) of
                                --Tide s@(SPoint p) -> case toTidden p of Tide p' -> Tide $ a `SBranch` (SPoint p')
                                Tide SLeaf -> Tide $ a `SBranch` SLeaf
                                --Tide (a' `SBranch` tr) -> Tide $ a `SBranch` (a' `SBranch` tr)
- -- where nest :: STree (S n2) (HTree (S n2)) (Branch a0 stru) -> STree (S n2) (STree (S (S n2)) f) _
- --       nest = undefined
+                               Tide (nest -> Tide stru') -> Tide $ a `SBranch` stru'
+hmap :: (x -> y) -> HTree n x -> HTree n y
+hmap = undefined
+
+nest :: STree n1 (Tidden ('S n1)) s -> Tidden n1 (STree ('S n1) f) -- STree n1 (STree ('S n1) f) s
+nest = undefined
 
 -- and back...
 {-
