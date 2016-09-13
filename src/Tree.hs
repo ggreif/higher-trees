@@ -10,6 +10,7 @@ import Data.Kind
 import Data.Foldable
 --import Diagrams.Prelude
 --import Diagrams.Backend.SVG.CmdLine
+import Data.Type.Equality
 
 -- * A rose tree
 -- We'll want to map the top-dimensional part of our
@@ -155,17 +156,17 @@ hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 
 
 -- and back...
-data STreeA n :: forall (a :: k) . (a' :: k) -> (a -> *) -> HTree n a -> * where
+data STreeA n :: forall a . a' -> (a -> *) -> HTree n a -> * where
   SPointA :: f a -> STreeA Z a' f (Point a)
   SLeafA :: STreeA (S n) a' f Leaf
   SBranchA :: f a -> STreeA n a' (STreeA (S n) a' f) stru -> STreeA (S n) a' f (a `Branch` stru)
 
 data TiddenA :: a -> Constraint -> Peano -> (a -> *) -> * where
-  TideA :: STreeA n a f s -> TiddenA a (a ~ s) n f 
+  TideA :: STreeA n a f s -> TiddenA a (a ~~ s) n f 
 
 
-fromTidden :: TiddenA a (a ~ i) n f -> HTree n (f a)
-fromTidden (TideA (SPointA a)) = Point a -- in codimension 0 we should be able to cast!
+--fromTidden :: TiddenA a (a ~~ i) n f -> HTree n (f a)
+--fromTidden (TideA (SPointA a)) = Point a -- in codimension 0 we should be able to cast!
 
 
 {-
