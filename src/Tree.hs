@@ -154,19 +154,24 @@ hmap f (Point a) = Point (f a)
 hmap f Leaf = Leaf
 hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 
+type family Castable co (a' :: i') (f :: i -> *) (a :: i) :: Constraint where
+  Castable Z a' f a = f a ~~ f a' -- TODO is (~) enough?
+  Castable (S co) a' f a = ()
 
 -- and back...
-data STreeA n :: forall a . a' -> (a -> *) -> HTree n a -> * where
-  SPointA :: f a -> STreeA Z a' f (Point a)
-  SLeafA :: STreeA (S n) a' f Leaf
-  SBranchA :: f a -> STreeA n a' (STreeA (S n) a' f) stru -> STreeA (S n) a' f (a `Branch` stru)
+data STreeA co n :: forall a . a' -> (a -> *) -> HTree n a -> * where
+  SPointA :: Castable co a' f a => f a -> STreeA co Z a' f (Point a)
+  SLeafA :: STreeA co (S n) a' f Leaf
+  SBranchA :: Castable co a' f a => f a -> STreeA (S co) n a' (STreeA co (S n) a' f) stru -> STreeA co (S n) a' f (a `Branch` stru)
 
-data TiddenA :: a -> Constraint -> Peano -> (a -> *) -> * where
-  TideA :: STreeA n a f s -> TiddenA a (a ~~ s) n f 
+data TiddenA :: a -> Peano -> (a -> *) -> * where
+  TideA :: STreeA Z n a f s -> TiddenA a n f 
 
 
---fromTidden :: TiddenA a (a ~~ i) n f -> HTree n (f a)
---fromTidden (TideA (SPointA a)) = Point a -- in codimension 0 we should be able to cast!
+fromTidden :: TiddenA a n f -> HTree n (f a)
+fromTidden (TideA (SPointA a)) = Point a -- in codimension 0 we should be able to cast!
+fromTidden (TideA SLeafA) = Leaf
+fromTidden (TideA (a `SBranchA` stru)) = (a `Branch` hmap (fromTidden . TideA) (fromTidden (TideA stru)))
 
 
 {-
