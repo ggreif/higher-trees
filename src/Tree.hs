@@ -156,20 +156,20 @@ hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 
 -- and back...
 data STreeA n' a' n :: forall a . (a -> *) -> HTree n a -> * where
-  SPointA :: Castable n' a' a => f a -> STreeA n' a' Z f (Point a)
+  SPointA :: f a -> STreeA n' a' Z f (Point a)
   SLeafA :: STreeA n' a' (S n) f Leaf
-  SBranchA :: Castable n' a' a => f a -> STreeA (S n') a' n (STreeA n' a' (S n) f) stru -> STreeA n' a' (S n) f (a `Branch` stru)
+  SBranchA :: f a -> STreeA (S n') a' n (STreeA n' a' (S n) f) stru -> STreeA n' a' (S n) f (a `Branch` stru)
 
-data TiddenA :: forall k  . Peano -> (a -> *) -> Peano -> a' -> * where
-  TideA :: STreeA n' a n f s -> TiddenA n f n' a
+data TiddenA :: forall k  . Peano -> (a -> *) -> Peano -> (a' :: i') -> * where
+  TideA :: Castable n' a' f s => STreeA n' a' n f s -> TiddenA n f n' a'
 
 type family Raise n f a where
   Raise Z f a = f a
   Raise (S n) f a = Raise n f (f a)
 
-type family Castable n a' a :: Constraint where
-  Castable Z a' a = a ~ a'
-  Castable (S n) a' a = ()
+type family Castable n (a' :: i') (f :: i -> *) (a :: i) :: Constraint where
+  Castable Z a' f a = f a ~ f a'
+  Castable (S n) a' (STreeA n' a' (S n) f) a = ()
 
 
 
