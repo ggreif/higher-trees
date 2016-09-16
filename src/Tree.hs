@@ -172,10 +172,12 @@ data TiddenA :: Peano -> a -> Peano -> (a -> *) -> * where
 fromTidden :: TiddenA Z a n f -> HTree n (f a)
 fromTidden (TideA (SPointA a)) = Point a -- in codimension 0 we should be able to cast!
 fromTidden (TideA SLeafA) = Leaf
-fromTidden (TideA (a `SBranchA` stru)) = (a `Branch` hmap (fromTidden) (fromTidden' (TideA' stru)))
+fromTidden (TideA (a `SBranchA` stru)) = (a `Branch` hmap fromTidden (fromTidden' (TideA' stru)))
 
 fromTidden' :: TiddenA (S Z) a n f -> HTree n (TiddenA Z a (S n) f)
-fromTidden' = undefined
+--fromTidden' (TideA' (SPointA a)) = Point a
+fromTidden' (TideA' SLeafA) = Leaf
+fromTidden' (TideA' (a `SBranchA` stru)) = (a `Branch` hmap _ (fromTidden' (TideA' stru)))
 
 type family Raise n f a where
   Raise Z f a = f a
