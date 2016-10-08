@@ -134,7 +134,7 @@ type family Empty n :: HTree n (HTree (S n) a) where
   Empty (S n) = Leaf
 
 
-data Tidden :: forall k  . Peano -> (a -> *) -> * where
+data Tidden :: Peano -> (a -> *) -> * where
   Tide :: STree n f s -> Tidden n f
 
 -- now convert!
@@ -177,7 +177,11 @@ fromTidden (TideA (a `SBranchA` stru)) = (a `Branch` hmap fromTidden (fromTidden
 fromTidden' :: TiddenA (S Z) a n f -> HTree n (TiddenA Z a (S n) f)
 --fromTidden' (TideA' (SPointA a)) = Point a
 fromTidden' (TideA' SLeafA) = Leaf
-fromTidden' (TideA' (a `SBranchA` stru)) = (a `Branch` hmap _ (fromTidden' (TideA' stru)))
+--fromTidden' (TideA' (a `SBranchA` stru)) = undefined --(a `Branch` hmap fromTidden' (fromTidden'' (TideA' stru)))
+
+fromTidden'' :: TiddenA (S (S Z)) a n f -> HTree n (TiddenA (S Z) a (S n) f)
+fromTidden'' = undefined
+
 
 type family Raise n f a where
   Raise Z f a = f a
