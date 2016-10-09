@@ -178,7 +178,7 @@ data TiddenC :: * -> Peano -> (a -> *) -> * where
 
 toTiddenC :: HTree n (f a) -> TiddenC (f a) n f
 toTiddenC (Point a) = TideC (SPoint a)
---toTiddenC Leaf = TideC SLeaf
+toTiddenC Leaf = undefined -- TODO: TideC SLeaf
 toTiddenC (a `Branch` (nest . hmap toTidden -> Tide stru)) = TideC $ a `SBranch` stru
 
 {-
@@ -190,8 +190,11 @@ nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 
 fromTiddenC :: TiddenC (f a) n f -> HTree n (f a)
 fromTiddenC (TideC (SPoint a)) = Point a -- in codimension 0 we should be able to cast!
---fromTidden (TideC SLeafA) = Leaf
-fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap fromTiddenC (fromTiddenC (TideC stru)))
+fromTiddenC (TideC SLeaf) = Leaf
+fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC (TideC stru)))
+  where wrap :: STree (S n) f (Payload n stru) -> TiddenC (f a) (S n) f
+        wrap SLeaf = undefined -- TODO
+        wrap t@(a `SBranch` stru) = TideC t
 
 
 
