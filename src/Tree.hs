@@ -188,6 +188,10 @@ nest Leaf = Tide SLeaf
 nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 -}
 
+fromTiddenC :: TiddenC (f a) n f -> HTree n (f a)
+fromTiddenC (TideC (SPoint a)) = Point a -- in codimension 0 we should be able to cast!
+--fromTidden (TideC SLeafA) = Leaf
+fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap fromTiddenC (fromTiddenC (TideC stru)))
 
 
 
