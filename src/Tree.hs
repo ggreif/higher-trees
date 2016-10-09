@@ -79,11 +79,15 @@ data STree n :: forall a . (a -> *) -> HTree n a -> * where
   SLeaf :: STree (S n) f Leaf
   SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
-data XTree n :: forall a . (a -> *) -> a -> HTree n a -> * where
-  XPoint :: f a -> XTree Z f a (Point a)
-  XLeaf :: XTree (S n) f a Leaf
-  XBranch :: f a -> XTree n (XTree (S n) f a) a' stru -> XTree (S n) f a (a `Branch` stru)
+{-
+type family Cod f a c :: 
 
+--data XTree p c n :: forall a . (a ~ Cod f p c) => (a -> *) -> HTree n a -> * where
+data XTree p c n :: forall a . (a -> *) -> HTree n a -> * where
+  XPoint :: f s -> XTree a c Z f (Point s)
+  XLeaf :: XTree a c (S n) f Leaf
+--  XBranch :: f a -> XTree n (XTree (S n) f a) a' stru -> XTree (S n) f a (a `Branch` stru)
+-}
 
 data HTree' n :: forall a . a -> HTree n a -> * where
   Point' :: a -> HTree' Z a (Point x)
@@ -161,11 +165,12 @@ hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 
 -- ** Track codimension while converting
 -- esp. only hide the singleton index, don't hide the leaf type
+-- Correction: STree *is* parametrized in 'a', when it stores the 'f a'.
+--             Just look at the singleton index.
 
---type family Cod f a c :: 
 
 data TiddenC :: a -> Peano -> (a -> *) -> * where
-  TideC :: (f a ~ f a) => STree n f s -> TiddenC a n f    -- STree needs to be parametrized in a!!!!! otherwise the a is lost?
+  TideC :: (f a ~ f a) => STree n f s -> TiddenC a n f    -- STree needs to be parametrized in a!!!!! otherwise the a is lost? -- SEE Correction above!
 
 
 toTiddenC :: HTree n (f a) -> TiddenC a n f
