@@ -168,14 +168,17 @@ hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 -- Correction: STree *is* parametrized in 'a', when it stores the 'f a'.
 --             Just look at the singleton index.
 
+type family Payload (n :: Peano) (s :: HTree n x) where
+  Payload Z (Point a) = a
+  Payload (S n) (a `Branch` stru) = a
 
-data TiddenC :: a -> Peano -> (a -> *) -> * where
-  TideC :: (f a ~ f a) => STree n f s -> TiddenC a n f    -- STree needs to be parametrized in a!!!!! otherwise the a is lost? -- SEE Correction above!
+data TiddenC :: * -> Peano -> (a -> *) -> * where
+  TideC :: (f (Payload n s) ~ a) => STree n f s -> TiddenC a n f
 
 
-toTiddenC :: HTree n (f a) -> TiddenC a n f
+toTiddenC :: HTree n (f a) -> TiddenC (f a) n f
 toTiddenC (Point a) = TideC (SPoint a)
-toTiddenC Leaf = TideC SLeaf
+--toTiddenC Leaf = TideC SLeaf
 toTiddenC (a `Branch` (nest . hmap toTidden -> Tide stru)) = TideC $ a `SBranch` stru
 
 {-
