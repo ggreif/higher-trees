@@ -188,11 +188,11 @@ nest Leaf = Tide SLeaf
 nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 -}
 
-fromTiddenC :: TiddenC (f a) n f -> HTree n (f a)
+fromTiddenC :: forall f a n . TiddenC (f a) n f -> HTree n (f a)
 fromTiddenC (TideC (SPoint a)) = Point a -- in codimension 0 we should be able to cast!
 fromTiddenC (TideC SLeaf) = Leaf
-fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC (TideC stru)))
-  where wrap :: STree (S n) f (Payload n stru) -> TiddenC (f a) (S n) f
+fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC . TideC $ stru))
+  where wrap :: (n ~ S m) => STree (S m) f s -> TiddenC (f a) (S m) f
         wrap SLeaf = undefined -- TODO
         wrap t@(a `SBranch` stru) = TideC t
 
