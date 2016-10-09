@@ -192,11 +192,12 @@ nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 fromTiddenC :: forall f a n . TiddenC (f a) n f -> HTree n (f a)
 fromTiddenC (TideC (SPoint a)) = Point a
 fromTiddenC (TideC SLeaf) = Leaf
-fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap ({-fromTiddenC . -}_) (fromTiddenC . TideC $ stru))
-  where wrap :: (n ~ S m) => STree (S m) f (a `Branch` stru) -> HTree n (f a) -- -> TiddenC (f a) n f
-        --wrap SLeaf = undefined -- TODO
-        --wrap t@(a `SBranch` SPoint a') = a `Branch` undefined -- SPoint a'
-        wrap t@(a `SBranch` stru) = fromTiddenC (TideC t)
+fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC . TideC $ stru))
+  where wrapB :: (a ~ a', n ~ S m) => STree (S m) f (a' `Branch` stru) -> TiddenC (f a) n f
+        wrapB t = TideC t
+        wrap :: (n ~ S m) => STree (S m) f stru -> TiddenC (f a) n f
+        wrap t@(a `SBranch` stru) = wrapB t
+        
 
 
 
