@@ -78,9 +78,9 @@ data HTree n a where
 data STree n :: forall a . (a -> *) -> HTree n a -> * where
   SPoint :: f a -> STree Z f (Point a)
   SLeaf :: STree (S n) f Leaf
-  SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
-  --SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
-  SBranch' :: Structure (S n) (a `Branch` stru) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  --SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  --SBranch' :: Structure (S n) (a `Branch` stru) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru) -- GHC bug???
 
 type family Structure (n :: Peano) (stru :: HTree n a) :: Constraint where
   Structure Z (Point a) = ()
@@ -168,12 +168,13 @@ data Tidden :: Peano -> (a -> *) -> * where
 toTidden :: HTree n (f a) -> Tidden n f
 toTidden (Point a) = Tide (SPoint a)
 toTidden Leaf = Tide SLeaf
-toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
+--toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
+--toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
 
 nest :: HTree m (Tidden (S m) f) -> Tidden m (STree ('S m) f)
 nest (Point (Tide st)) = Tide (SPoint st)
 nest Leaf = Tide SLeaf
-nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
+nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch'` tr
 
 hmap :: (x -> y) -> HTree n x -> HTree n y
 hmap f (Point a) = Point (f a)
