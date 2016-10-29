@@ -82,11 +82,10 @@ data STree n :: forall a . (a -> *) -> HTree n a -> * where
   --SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
   SBranch' :: Structure (S n) (a `Branch` stru) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
-class Structure (n :: Peano) (stru :: HTree n a)
-
-instance Structure Z (Point a)
-instance Structure (S n) Leaf
-instance (Payload (S n) (Payload n stru) ~ a) => Structure (S n) (a `Branch` stru :: HTree (S n) *)
+type family Structure (n :: Peano) (stru :: HTree n a) :: Constraint where
+  Structure Z (Point a) = ()
+  Structure (S n) Leaf = ()
+  Structure (S n) (a `Branch` stru :: HTree (S n) *) = Payload (S n) (Payload n stru) ~ a
 
 s2h :: STree n f stru -> HTree n (f (Payload n stru))
 s2h (SPoint a) = Point a
