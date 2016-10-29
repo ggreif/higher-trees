@@ -78,7 +78,18 @@ data STree n :: forall a . (a -> *) -> HTree n a -> * where
   SPoint :: f a -> STree Z f (Point a)
   SLeaf :: STree (S n) f Leaf
   SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
-  SBranch' :: (Payload (S n) stru ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+
+
+
+s2h :: STree n f stru -> HTree n (f (Payload n stru))
+s2h (SPoint a) = Point a
+s2h SLeaf = Leaf
+--s2h (a `SBranch` stru) = a `Branch` hmap s2h (s2h stru)
+s2h (a `SBranch'` stru) = a `Branch` hmap s2h (s2h stru)
+
+
+
 
 {-
 type family Cod f a c :: 
@@ -193,12 +204,17 @@ nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch` tr
 fromTiddenC :: forall f a n . TiddenC (f a) n f -> HTree n (f a)
 fromTiddenC (TideC (SPoint a)) = Point a
 fromTiddenC (TideC SLeaf) = Leaf
-fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC . TideC $ stru))
+fromTiddenC (TideC (a `SBranch` stru)) = a `Branch` wumm stru
+  where wumm :: (S m ~ n) => STree m (STree n f) stru
+             -> HTree m (HTree n (f a))
+        wumm (SPoint SLeaf) = Point Leaf -- Point(fromTiddenC (_ a))
+        --wumm (SPoint (a `SBranch` stru)) = Point (a `Branch` wumm stru)
+{-fromTiddenC (TideC (a `SBranch` stru)) = (a `Branch` hmap (fromTiddenC . wrap) (fromTiddenC . TideC $ stru))
   where wrapB :: (a ~ a', n ~ S m) => STree (S m) f (a' `Branch` stru) -> TiddenC (f a) n f
         wrapB t = TideC t
         wrap :: (n ~ S m) => STree (S m) f stru -> TiddenC (f a) n f
-        wrap t@(a `SBranch` _) = wrapB t
-        
+        wrap t@(a `SBranch` _) = _ t
+        -}
 
 
 
