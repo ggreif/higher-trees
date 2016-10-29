@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-} -- for Show only
 {-# LANGUAGE RankNTypes, TypeInType, TypeOperators, KindSignatures, ViewPatterns #-}
 {-# LANGUAGE TypeApplications, TypeFamilies, FlexibleContexts, FlexibleInstances #-}
@@ -78,9 +79,14 @@ data STree n :: forall a . (a -> *) -> HTree n a -> * where
   SPoint :: f a -> STree Z f (Point a)
   SLeaf :: STree (S n) f Leaf
   SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
-  SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  --SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  SBranch' :: Structure (S n) (a `Branch` stru) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
 
+class Structure (n :: Peano) (stru :: HTree n a)
 
+instance Structure Z (Point a)
+instance Structure (S n) Leaf
+instance (Payload (S n) (Payload n stru) ~ a) => Structure (S n) (a `Branch` stru :: HTree (S n) *)
 
 s2h :: STree n f stru -> HTree n (f (Payload n stru))
 s2h (SPoint a) = Point a
@@ -184,6 +190,7 @@ type family Payload (n :: Peano) (s :: HTree n x) where
   Payload Z (Point a) = a
   Payload (S n) (a `Branch` stru) = a
 
+{-
 data TiddenC :: * -> Peano -> (a -> *) -> * where
   --TideC :: (f (Payload n s) ~ a) => STree n f s -> TiddenC a n f
   TideC :: STree n f s -> TiddenC (f (Payload n s)) n f
@@ -215,7 +222,7 @@ fromTiddenC (TideC (a `SBranch` stru)) = a `Branch` wumm stru
         wrap :: (n ~ S m) => STree (S m) f stru -> TiddenC (f a) n f
         wrap t@(a `SBranch` _) = _ t
         -}
-
+-}
 
 
 
