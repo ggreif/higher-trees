@@ -78,7 +78,7 @@ data HTree n a where
 data STree n :: forall a . (a -> *) -> HTree n a -> * where
   SPoint :: f a -> STree Z f (Point a)
   SLeaf :: STree (S n) f Leaf
-  --SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
+  SBranch :: f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
   SBranch' :: (Payload (S n) (Payload n stru) ~ a) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru)
   --SBranch' :: Structure (S n) (a `Branch` stru) => f a -> STree n (STree (S n) f) stru -> STree (S n) f (a `Branch` stru) -- GHC bug???
 
@@ -169,17 +169,41 @@ toTidden :: HTree n (f a) -> Tidden n f
 toTidden (Point a) = Tide (SPoint a)
 toTidden Leaf = Tide SLeaf
 --toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
---toTidden (a `Branch` (nest . hmap toTidden -> Tide stru)) = Tide $ a `SBranch` stru
+toTidden (a `Branch` stru) = case stru of
+                               Point x -> Tide $ undefined -- a `SBranch` _ x
 
 nest :: HTree m (Tidden (S m) f) -> Tidden m (STree ('S m) f)
 nest (Point (Tide st)) = Tide (SPoint st)
 nest Leaf = Tide SLeaf
-nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch'` tr
+--nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch'` tr
+----nest (Tide a `Branch` stru) = case hmap nest stru of Point tr -> Tide $ a `SBranch'` _ tr
 
 hmap :: (x -> y) -> HTree n x -> HTree n y
 hmap f (Point a) = Point (f a)
 hmap f Leaf = Leaf
 hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
+
+
+-- ** save outer type?
+
+data TiddenA x :: forall a . Peano -> (a -> *) -> * where
+  TideA :: (a ~ Payload n stru) => STree n f stru -> TiddenA (f a) n f 
+
+toTiddenA :: HTree n (f a) -> TiddenA (f a) n f
+toTiddenA (Point a) = TideA (SPoint a)
+--toTiddenA Leaf = TideA SLeaf
+toTiddenA (a `Branch` (toTiddenA . hmap toTiddenA -> TideA stru)) = case stru of
+                                                                      SPoint p@TideA{} -> p
+                                                                      TideA i `SBranch'` j -> TideA $ a `SBranch'` (i `SBranch` _ j)
+
+nestA :: HTree m (TiddenA (f a) (S m) f) -> TiddenA a m (STree (S m) f)
+nestA = undefined
+
+--nestA (Point (Tide st)) = Tide (SPoint st)
+--nestA Leaf = Tide SLeaf
+--nest (Tide a `Branch` (nest . hmap nest -> Tide tr)) = Tide $ a `SBranch'` tr
+
+
 
 -- ** Track codimension while converting
 -- esp. only hide the singleton index, don't hide the leaf type
@@ -225,7 +249,7 @@ fromTiddenC (TideC (a `SBranch` stru)) = a `Branch` wumm stru
 -}
 
 
-
+{-
 type family Castable co (a' :: i') (f :: i -> *) (a :: i) :: Constraint where
   Castable Z a' f a = f a ~ f a' -- TODO is (~) enough?
   Castable (S co) a' f a = () -- f a ~ f a'
@@ -253,7 +277,7 @@ fromTidden' (TideA' SLeafA) = Leaf
 
 fromTidden'' :: TiddenA (S (S Z)) a n f -> HTree n (TiddenA (S Z) a (S n) f)
 fromTidden'' = undefined
-
+-}
 
 type family Raise n f a where
   Raise Z f a = f a
