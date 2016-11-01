@@ -192,9 +192,28 @@ data TiddenA x :: forall a . Peano -> (a -> *) -> * where
 toTiddenA :: HTree n (f a) -> TiddenA (f a) n f
 toTiddenA (Point a) = TideA (SPoint a)
 --toTiddenA Leaf = TideA SLeaf
-toTiddenA (a `Branch` (toTiddenA . hmap toTiddenA -> TideA stru)) = case stru of
-                                                                      SPoint p@TideA{} -> p
-                                                                      TideA i `SBranch'` j -> TideA $ a `SBranch'` (i `SBranch` _ j)
+toTiddenA (a `Branch` (toTiddenA -> TideA stru)) = case stru of
+                                                     --SPoint p -> case toTiddenA p of TideA p' -> TideA $ a `SBranch` p'
+                                                     b@(i `SBranch'` j) -> TideA $ a `SBranch` help a b
+
+type family ReStru (f :: a -> *) (k :: HTree (S n) *) :: HTree (S n) (HTree (S (S n)) a)
+
+help :: f a
+     -> STree (S n) (HTree (S (S n))) stru
+     -> STree (S n) (STree (S (S n)) f) (ReStru f stru)
+help = undefined
+       
+
+{-
+help :: (a ~ Payload n stru) => STree n (HTree (S n)) stru -> TiddenA (f a) n f
+help (SPoint p@TideA{}) = p
+help (TideA i `SBranch'` j) = TideA $ a `SBranch'` (i `SBranch` _ j)
+-}
+{-
+help :: (a ~ Payload n stru) => STree n f stru -> TiddenA (f a) n f
+help (SPoint p@TideA{}) = p
+help (TideA i `SBranch'` j) = TideA $ a `SBranch'` (i `SBranch` _ j)
+-}
 
 nestA :: HTree m (TiddenA (f a) (S m) f) -> TiddenA a m (STree (S m) f)
 nestA = undefined
