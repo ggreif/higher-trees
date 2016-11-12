@@ -77,7 +77,7 @@ data XTree n x :: forall a . (a -> *) -> HTree n a -> * where
   XPoint :: f a -> XTree Z (f a) f (Point a)
   XLeaf :: XTree (S n) (f a) f Leaf
   --XBranch :: f a -> XTree n x (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
-  XBranch :: f a -> XTree n ((XTree (S n) (f a) f) x) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
+  XBranch :: f a -> XTree n (XTree (S n) (f a) f strustru) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
 
 deriving instance Show (f a) => Show (XTree n (f a) f s)
 
@@ -88,8 +88,35 @@ deriving instance Show (f a) => Show (Xidden n (f a))
 h2x :: HTree n (f a) -> Xidden n (f a)
 h2x (Point a) = Xide (XPoint a)
 h2x Leaf = Xide XLeaf
-h2x (a `Branch` stru) = case h2x stru of
-  Xide s -> Xide (a `XBranch` unsafeCoerce s)
+h2x (a `Branch` stru) = case (h2x . hmap h2x) stru of
+  x@(Xide s) -> Xide (a `XBranch` (tra {-stru-} s {-x-}))
+
+tra :: --HTree n2 (HTree ('S n2) (f a))
+    -- ->
+    XTree n2 (Xidden ('S n2) (f a)) (Xidden ('S n2)) s
+--    -> XTree n2 (HTree ('S n2) (f a)) (HTree ('S n2)) s
+--    -> XTree n2 (f1 a2) f1 s
+    -- -> Xidden n2 (Xidden ('S n2) (f a))
+    -> XTree n2
+                  (XTree ('S n2) (f a) f strustru0)
+                  (XTree ('S n2) (f a) f)
+                  stru0
+tra XLeaf = unsafeCoerce XLeaf
+tra (XPoint (Xide s)) = unsafeCoerce (XPoint s)
+--tra (Xide s `XBranch` (XPoint (stru))) = unsafeCoerce (s `XBranch` tra stru)
+--tra (Xide s `XBranch` (Xide stru)) = unsafeCoerce (s `XBranch` tra stru)
+--tra (Xide s `XBranch` (Xide stru)) = unsafeCoerce (s `XBranch` tra stru)
+--tra (Xide s `XBranch` (Xide stru)) = unsafeCoerce (s `XBranch` tra stru)
+
+
+--wa :: XTree n2 (Xidden ('S n2) (f a)) (Xidden ('S n2)) s
+--   -> 
+
+xmap :: (f a -> g a) -> XTree n (f a) f stru -> XTree n (g a) g stru
+xmap tr (XPoint fa) = XPoint (tr fa)
+xmap _ XLeaf = XLeaf
+xmap tr (fa `XBranch` stru) = tr fa `XBranch` xmap (xmap tr) stru
+
 
 x2h :: Xidden n (f a) -> HTree n (f a)
 x2h (Xide (XPoint a)) = Point a
