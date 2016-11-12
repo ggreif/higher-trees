@@ -71,6 +71,28 @@ data HTree n a where
   Leaf :: HTree (S n) a
   Branch :: a -> HTree n (HTree (S n) a) -> HTree (S n) a
 
+data XTree n x :: forall a . (a -> *) -> HTree n a -> * where
+  XPoint :: f a -> XTree Z (f a) f (Point a)
+  XLeaf :: XTree (S n) (f a) f Leaf
+  --XBranch :: f a -> XTree n x (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
+  XBranch :: f a -> XTree n ((XTree (S n) (f a) f) x) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
+
+
+data Xidden :: Peano -> * -> * where
+  Xide :: XTree n (f a) f s -> Xidden n (f a)
+
+h2x :: HTree n (f a) -> Xidden n (f a)
+h2x (Point a) = Xide (XPoint a)
+h2x Leaf = Xide XLeaf
+h2x (a `Branch` stru) = case h2x (hmap h2x stru) of Xide s -> Xide (a `XBranch` _ s)
+
+x2h :: Xidden n (f a) -> HTree n (f a)
+x2h (Xide (XPoint a)) = Point a
+x2h (Xide XLeaf) = Leaf
+x2h (Xide (a `XBranch` s)) = a `Branch` (hmap (x2h . Xide) . x2h) (Xide s)
+
+
+
 -- can we simply always pass the presheaf?
 -- this needs polymorphic recursion in the kinds!
 -- we need to be totally explicit about the kinds,
@@ -192,10 +214,11 @@ data TiddenA x :: forall a . Peano -> (a -> *) -> * where
 toTiddenA :: HTree n (f a) -> TiddenA (f a) n f
 toTiddenA (Point a) = TideA (SPoint a)
 --toTiddenA Leaf = TideA SLeaf
+{-
 toTiddenA (a `Branch` (toTiddenA -> TideA stru)) = case stru of
                                                      --SPoint p -> case toTiddenA p of TideA p' -> TideA $ a `SBranch` p'
-                                                     b@(i `SBranch'` j) -> TideA $ a `SBranch` help a b
-
+                                                     b@(i `SBranch'` j) -> TideA $ a `SBranch'` help a b
+-}
 type family ReStru (f :: a -> *) (k :: HTree (S n) *) :: HTree (S n) (HTree (S (S n)) a)
 
 help :: f a
