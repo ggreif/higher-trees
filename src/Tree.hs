@@ -77,7 +77,7 @@ data XTree n x :: forall a . (a -> *) -> HTree n a -> * where
   XPoint :: f a -> XTree Z (f a) f (Point a)
   XLeaf :: XTree (S n) (f a) f Leaf
   --XBranch :: f a -> XTree n x (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
-  XBranch :: f a -> XTree n (XTree (S n) (f a) f strustru) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
+  XBranch :: {-HasPayload (S n) strustru a =>-} f a -> XTree n (XTree (S n) (f a) f strustru) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
 
 deriving instance Show (f a) => Show (XTree n (f a) f s)
 
@@ -88,8 +88,13 @@ deriving instance Show (f a) => Show (Xidden n (f a))
 h2x :: HTree n (f a) -> Xidden n (f a)
 h2x (Point a) = Xide (XPoint a)
 h2x Leaf = Xide XLeaf
-h2x (a `Branch` stru) = case (h2x . hmap h2x) stru of
-  x@(Xide s) -> Xide (a `XBranch` (tra {-stru-} s {-x-}))
+--h2x (a `Branch` stru) = case (h2x . hmap h2x) stru of
+  --x@(Xide s) -> Xide (a `XBranch` (tra {-stru-} s {-x-}))
+h2x (a `Branch` stru) = case h2x stru of
+  Xide (XPoint p) -> case (h2x p) of Xide xx -> Xide (a `XBranch` XPoint xx)
+  Xide XLeaf -> Xide (a `XBranch` XLeaf)
+  --Xide s@(p `XBranch` ssss) -> case (h2x p, xmap h2x ssss) of (Xide xx, sss) -> Xide (a `XBranch` (xx `XBranch` _ sss))
+  --Xide s@(p `XBranch` ssss) -> case (h2x p) of Xide xx -> Xide (a `XBranch` (xx `XBranch` _ ssss))
 
 tra :: --HTree n2 (HTree ('S n2) (f a))
     -- ->
@@ -284,7 +289,13 @@ nestA = undefined
 -- Correction: STree *is* parametrized in 'a', when it stores the 'f a'.
 --             Just look at the singleton index.
 
-type family Payload (n :: Peano) (s :: HTree n x) where
+type family HasPayload (n :: Peano) (s :: HTree n x) (b :: x) :: Constraint where
+  HasPayload Z (Point a) b = a ~ b
+  HasPayload (S n) Leaf b = ()
+  HasPayload (S n) (a `Branch` stru) b = (a ~ b, HasPayload n stru (a `Branch` stru))
+
+
+type family Payload (n :: Peano) (s :: HTree n x) :: x where
   Payload Z (Point a) = a
   Payload (S n) (a `Branch` stru) = a
 
