@@ -12,6 +12,8 @@ import Data.Foldable
 --import Diagrams.Prelude
 --import Diagrams.Backend.SVG.CmdLine
 import Data.Type.Equality
+import Unsafe.Coerce (unsafeCoerce)
+import Data.Functor.Identity
 
 -- * A rose tree
 -- We'll want to map the top-dimensional part of our
@@ -77,14 +79,17 @@ data XTree n x :: forall a . (a -> *) -> HTree n a -> * where
   --XBranch :: f a -> XTree n x (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
   XBranch :: f a -> XTree n ((XTree (S n) (f a) f) x) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
 
+deriving instance Show (f a) => Show (XTree n (f a) f s)
 
 data Xidden :: Peano -> * -> * where
   Xide :: XTree n (f a) f s -> Xidden n (f a)
+deriving instance Show (f a) => Show (Xidden n (f a))
 
 h2x :: HTree n (f a) -> Xidden n (f a)
 h2x (Point a) = Xide (XPoint a)
 h2x Leaf = Xide XLeaf
-h2x (a `Branch` stru) = case h2x (hmap h2x stru) of Xide s -> Xide (a `XBranch` _ s)
+h2x (a `Branch` stru) = case h2x (hmap h2x stru) of
+  Xide s -> Xide (a `XBranch` unsafeCoerce s)
 
 x2h :: Xidden n (f a) -> HTree n (f a)
 x2h (Xide (XPoint a)) = Point a
