@@ -88,7 +88,7 @@ deriving instance Show (f a) => Show (Xidden n (f a))
 h2x :: HTree n (f a) -> Xidden n (f a)
 h2x (Point a) = Xide (XPoint a)
 h2x Leaf = Xide XLeaf
-h2x (a `Branch` stru) = case h2x (hmap h2x stru) of
+h2x (a `Branch` stru) = case h2x stru of
   Xide s -> Xide (a `XBranch` unsafeCoerce s)
 
 x2h :: Xidden n (f a) -> HTree n (f a)
