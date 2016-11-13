@@ -248,8 +248,13 @@ s2hP (SPoint a) = Point a
 s2hL :: STree (S n) f Leaf -> HTree (S n) (f a)
 s2hL SLeaf = Leaf
 
-s2hB :: forall n (a :: k) (f :: k -> *) stru . (forall s . {-HasPayload n s a =>-} STree n (STree (S n) f) s -> HTree n (HTree (S n) (f a))) -> STree (S n) f (a `Branch` stru) -> HTree (S n) (f a)
+s2hB :: forall n (a :: k) (f :: k -> *) stru . (STree n (STree (S n) f) stru -> HTree n (HTree (S n) (f a))) -> STree (S n) f (a `Branch` stru) -> HTree (S n) (f a)
 s2hB conv (a `SBranch` stru) = a `Branch` conv stru
+
+mila :: forall n (a :: k) (f :: k -> *) s . HasPayload n s a => STree n (STree (S n) f) s -> HTree n (HTree (S n) (f a))
+--mila (SPoint a) = Point a
+mila SLeaf = Leaf
+
 
 --hxmap :: (forall n (a :: k) (f :: k -> *) (s :: HTree n k) . {-HasPayload n s a =>-} STree n f s -> HTree n (f a)) -> HTree n (STree (S n) f) -> HTree n (HTree (S n) (f a))
 hxmap = undefined
