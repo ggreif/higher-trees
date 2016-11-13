@@ -77,7 +77,7 @@ data XTree n x :: forall a . (a -> *) -> HTree n a -> * where
   XPoint :: f a -> XTree Z (f a) f (Point a)
   XLeaf :: XTree (S n) (f a) f Leaf
   --XBranch :: f a -> XTree n x (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
-  XBranch :: {-HasPayload (S n) strustru a =>-} f a -> XTree n (XTree (S n) (f a) f strustru) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
+  XBranch :: {-HasPayload n stru (a `Branch` stru) =>-} {-HasPayload (S n) strustru a =>-} f a -> XTree n (XTree (S n) (f a) f strustru) (XTree (S n) (f a) f) stru -> XTree (S n) (f a) f (a `Branch` stru)
 
 deriving instance Show (f a) => Show (XTree n (f a) f s)
 
@@ -242,6 +242,17 @@ hmap f (Point a) = Point (f a)
 hmap f Leaf = Leaf
 hmap f (a `Branch` tr) = f a `Branch` hmap (hmap f) tr
 
+s2hP :: STree Z f (Point a) -> HTree Z (f a)
+s2hP (SPoint a) = Point a
+
+s2hL :: STree (S n) f Leaf -> HTree (S n) (f a)
+s2hL SLeaf = Leaf
+
+s2hB :: forall n (a :: k) (f :: k -> *) stru . (forall s . {-HasPayload n s a =>-} STree n (STree (S n) f) s -> HTree n (HTree (S n) (f a))) -> STree (S n) f (a `Branch` stru) -> HTree (S n) (f a)
+s2hB conv (a `SBranch` stru) = a `Branch` conv stru
+
+--hxmap :: (forall n (a :: k) (f :: k -> *) (s :: HTree n k) . {-HasPayload n s a =>-} STree n f s -> HTree n (f a)) -> HTree n (STree (S n) f) -> HTree n (HTree (S n) (f a))
+hxmap = undefined
 
 -- ** save outer type?
 
